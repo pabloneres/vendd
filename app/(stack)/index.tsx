@@ -23,11 +23,14 @@ const App = () => {
     const [coluna1, setColuna1] = useState<Item[]>([
         { id: 1, nome: "Marília Gonçalves", produto: "Trilogia Russell Brunson", valor: 1997, prazo: "Em 7 dias", status: "em_dias", destaque: true },
         { id: 2, nome: "João da Silva Santos", produto: "English Speed Faster", valor: 2497, prazo: "Hoje", status: "hoje", destaque: false },
-        { id: 3, nome: "Maria Clara Oliveira", produto: "Accelerate Your English Skills", valor: 797, prazo: "Há 3 dias", status: "atrasado", destaque: true }
+        { id: 3, nome: "Maria Clara Oliveira", produto: "Accelerate Your English Skills", valor: 797, prazo: "Há 3 dias", status: "atrasado", destaque: true },
+        { id: 4, nome: "Joana Miranda", produto: "Accelerate Your English Skills", valor: 797, prazo: "Há 3 dias", status: "atrasado", destaque: true },
+        { id: 5, nome: "João Silva", produto: "Accelerate Your English Skills", valor: 797, prazo: "Há 3 dias", status: "atrasado", destaque: true },
+        { id: 6, nome: "Joana M", produto: "Accelerate Your English Skills", valor: 797, prazo: "Há 3 dias", status: "atrasado", destaque: true },
     ]);
     const [coluna2, setColuna2] = useState<Item[]>([
-        { id: 4, nome: "Ana Luiza Mendes", produto: "Trilogia Russell Brunson", valor: 1997, prazo: "Hoje", status: "hoje", destaque: true },
-        { id: 5, nome: "Gustavo Almeida", produto: "Boost Your English", valor: 497, prazo: "Há 3 dias", status: "atrasado", destaque: false },
+        { id: 16, nome: "Ana Luiza Mendes", produto: "Trilogia Russell Brunson", valor: 1997, prazo: "Hoje", status: "hoje", destaque: true },
+        { id: 17, nome: "Gustavo Almeida", produto: "Boost Your English", valor: 497, prazo: "Há 3 dias", status: "atrasado", destaque: false },
     ]);
     const [coluna3, setColuna3] = useState<Item[]>([]);
     const [coluna4, setColuna4] = useState<Item[]>([]);
@@ -412,6 +415,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingBottom: 20,
         paddingTop: 5,
+        minHeight: '100%',
     },
     scrollView: {
         flex: 1,

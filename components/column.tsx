@@ -1,6 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
+import { useRef } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import DraggableItem, { Item } from "./item";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const COLUMN_WIDTH = 250;
+const COLUMN_HEIGHT = SCREEN_HEIGHT - 150; // Ajuste esse valor conforme necessário
 
 export interface ColumnProps {
     title: string;
@@ -16,8 +21,6 @@ export interface ColumnProps {
     isDragTarget: boolean;
 }
 
-const COLUMN_WIDTH = 250;
-
 export default function Column({
     title,
     icon,
@@ -32,6 +35,35 @@ export default function Column({
     isDragTarget
 }: ColumnProps) {
     const [quantidade, valorTotal] = total.split('  ');
+    const scrollViewRef = useRef<ScrollView>(null);
+
+    const handleItemDragStart = (item: Item, absX: number, absY: number) => {
+        onItemDragStart(item, absX, absY, index);
+    };
+
+    const handleItemDrag = (tx: number, absX: number, absY: number) => {
+        // Detectar quando o item está próximo às bordas da coluna para fazer auto-scroll
+        const scrollMargin = 80;
+        const relativeY = absY - 150; // Valor aproximado baseado no topo da tela
+
+        if (scrollViewRef.current) {
+            if (relativeY < scrollMargin) {
+                // Auto-scroll para cima quando próximo ao topo
+                scrollViewRef.current.scrollTo({
+                    y: Math.max(0, relativeY - scrollMargin),
+                    animated: true
+                });
+            } else if (relativeY > COLUMN_HEIGHT - scrollMargin) {
+                // Auto-scroll para baixo quando próximo ao fundo
+                scrollViewRef.current.scrollTo({
+                    y: relativeY + scrollMargin - COLUMN_HEIGHT,
+                    animated: true
+                });
+            }
+        }
+
+        onItemDrag(tx, absX, absY, index);
+    };
 
     return (
         <View
@@ -51,19 +83,26 @@ export default function Column({
                 <Text style={styles.columnQuantidade}>{quantidade}</Text>
                 <Text style={styles.columnTotalValor}>{valorTotal}</Text>
             </View>
-            <View style={styles.columnContent}>
-                {items.map((item) => (
-                    <DraggableItem
-                        key={item.id}
-                        item={item}
-                        onDrop={(direction) => onItemDrop(item, index, direction)}
-                        onDrag={(tx, absX, absY) => onItemDrag(tx, absX, absY, index)}
-                        onDragStart={(item, absX, absY) => onItemDragStart(item, absX, absY, index)}
-                        onDragEnd={onItemDragEnd}
-                        onReorder={onItemReorder ? (direction) => onItemReorder(item, index, direction) : undefined}
-                    />
-                ))}
-            </View>
+            <ScrollView
+                ref={scrollViewRef}
+                style={styles.columnScroll}
+                contentContainerStyle={styles.columnScrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.columnContent}>
+                    {items.map((item) => (
+                        <DraggableItem
+                            key={item.id}
+                            item={item}
+                            onDrop={(direction) => onItemDrop(item, index, direction)}
+                            onDrag={(tx, absX, absY) => handleItemDrag(tx, absX, absY)}
+                            onDragStart={(item, absX, absY) => handleItemDragStart(item, absX, absY)}
+                            onDragEnd={onItemDragEnd}
+                            onReorder={onItemReorder ? (direction) => onItemReorder(item, index, direction) : undefined}
+                        />
+                    ))}
+                </View>
+            </ScrollView>
         </View>
     );
 };
@@ -108,13 +147,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#27272A',
         borderRadius: 12,
         paddingHorizontal: 0,
-        paddingBottom: 15,
+        paddingBottom: 0,
         elevation: 5,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3,
         overflow: 'hidden',
+        height: COLUMN_HEIGHT, // Usa altura calculada baseada na tela
     },
     columnHeader: {
         flexDirection: 'row',
@@ -146,5 +186,12 @@ const styles = StyleSheet.create({
     },
     columnContent: {
         paddingHorizontal: 8,
+        paddingBottom: 10,
+    },
+    columnScroll: {
+        flex: 1,
+    },
+    columnScrollContent: {
+        paddingBottom: 20,
     },
 })
